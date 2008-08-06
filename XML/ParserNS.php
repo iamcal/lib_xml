@@ -14,9 +14,7 @@
 	# GPL for more details (http://www.gnu.org/licenses/gpl.html)
 	#
 
-	require_once 'PEAR.php';
-
-	class XML_ParserNS extends PEAR {
+	class XML_ParserNS {
 
 		var $parser;
 		var $fp;
@@ -33,9 +31,9 @@
 		var $srcenc;
 		var $tgtenc;
 		var $use_call_user_func = true;
+		var $last_error;
 
 		function XML_ParserNS($srcenc = null, $mode = "event", $tgtenc = null){
-			$this->PEAR('XML_ParserNS_Error');
 
 			if ($srcenc === null){
 				$xp = @xml_parser_create();
@@ -110,10 +108,10 @@
 				return $this->raiseError("no input");
 			}
 			while ($data = fread($this->fp, 2048)){
-				$err = $this->parseString($data, feof($this->fp));
-				if (PEAR::isError($err)){
+				$ok = $this->parseString($data, feof($this->fp));
+				if (!$ok){
 					fclose($this->fp);
-					return $err;
+					return 0;
 				}
 			}
 			fclose($this->fp);
@@ -122,9 +120,9 @@
 
 		function parseString($data, $eof = false){
 			if (!xml_parse($this->parser, $data, $eof)){
-				$err = $this->raiseError($this->parser);
+				$this->raiseError($this->parser);
 				xml_parser_free($this->parser);
-				return $err;
+				return 0;
 			}
 			return true;
 		}
@@ -235,23 +233,11 @@
 			return '';
 		}
 
+		function raiseError($str){
+			$this->last_error = $str;
+			return 0;
+		}
+
 		######################################################################################
 	}
-
-	class XML_ParserNS_Error extends PEAR_Error {
-
-		var $error_message_prefix = 'XML_ParserNS: ';
-
-		function XML_ParserNS_Error($msgorparser = 'unknown error', $code = 0, $mode = PEAR_ERROR_RETURN, $level = E_USER_NOTICE){
-			if (is_resource($msgorparser)){
-				$code = xml_get_error_code($msgorparser);
-				$msgorparser = sprintf("%s at XML input line %d",
-							xml_error_string($code),
-							xml_get_current_line_number($msgorparser)
-						);
-			}
-			$this->PEAR_Error($msgorparser, $code, $mode, $level);
-		}
-	}
-
 ?>

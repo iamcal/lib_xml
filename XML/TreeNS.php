@@ -70,14 +70,14 @@
 		function &getTreeFromFile(){
 			$this->folding = false;
 			$this->XML_Parser(null, 'event');
-			$err = $this->setInputFile($this->filename);
-			if (PEAR::isError($err)){
-				return $err;
+			$ok = $this->setInputFile($this->filename);
+			if (!$ok){
+				return 0;
 			}
 			$this->cdata = null;
-			$err = $this->parse();
-			if (PEAR::isError($err)){
-				return $err;
+			$ok = $this->parse();
+			if (!$ok){
+				return 0;
 			}
 			return $this->root;
 		}
@@ -86,9 +86,9 @@
 			$this->folding = false;
 			$this->XML_ParserNS($encoding, 'event');
 			$this->cdata = null;
-			$err = $this->parseString($str);
-			if (PEAR::isError($err)){
-				return $err;
+			$ok = $this->parseString($str);
+			if (!$ok){
+				return 0;
 			}
 			return $this->root;
 		}
