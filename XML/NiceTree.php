@@ -36,6 +36,10 @@
 			return $this->base->findSingle($list);
 		}
 
+		function findSingleContent($list){
+			return $this->base->findSingleContent($list);
+		}
+
 		function findSingleAttribute($list, $attribute){
 			return $this->base->findSingleAttribute($list, $attribute);
 		}

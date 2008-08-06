@@ -21,6 +21,11 @@
 			return $nodes[0];
 		}
 
+		function findSingleContent($list){
+
+			$node = $this->findSingle($list);
+			return $node->content;
+		}
 
 		function findMulti($list){
 
