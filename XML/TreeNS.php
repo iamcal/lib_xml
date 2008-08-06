@@ -24,6 +24,8 @@
 		var $namespace = array();
 		var $root = NULL;
 		var $version = '1.0';
+		var $node_class = 'XML_TreeNS_NodeNS';
+		var $is_a_tree = 1;
 
 		function XML_TreeNS($filename = '', $version = '1.0'){
 			$this->filename = $filename;
@@ -31,12 +33,12 @@
 		}
 
 		function &addRoot($name, $content = '', $attributes = array()){
-			$this->root = new XML_TreeNS_NodeNS($name, $content, $attributes);
+			$this->root = new $this->node_class($name, $content, $attributes);
 			return $this->root;
 		}
 
 		function &addRootNS($name, $content, $attributes, $ns_url, $local_el){
-			$this->root = new XML_TreeNS_NodeNS($name, $content, $attributes);
+			$this->root = new $this->node_class($name, $content, $attributes);
 
 			$this->root->namespace = $ns_url;
 			$this->root->local_name = $local_el;
@@ -101,10 +103,10 @@
 				if (!empty($this->cdata)){
 					$parent_id = 'obj' . ($this->i - 1);
 					$parent    =& $this->$parent_id;
-					$parent->children[] = &new XML_TreeNS_NodeNS(null, $this->cdata);
+					$parent->children[] = &new $this->node_class(null, $this->cdata);
 				}
 				$obj_id = 'obj' . $this->i++;
-				$this->$obj_id = &new XML_TreeNS_NodeNS($elem, null, $attribs);
+				$this->$obj_id = &new $this->node_class($elem, null, $attribs);
 				$this->$obj_id->namespace = $ns_url;
 				$this->$obj_id->local_name = $local_el;
 				$this->$obj_id->clark_name = '{'.$ns_url.'}'.$local_el;
@@ -120,7 +122,7 @@
 				$node   =& $this->$obj_id;
 				if (count($node->children) > 0){
 					if (trim($this->cdata)){
-						$node->children[] = &new XML_TreeNS_NodeNS(null, $this->cdata);
+						$node->children[] = &new $this->node_class(null, $this->cdata);
 					}
 				}else{
 					$node->setContent($this->cdata);

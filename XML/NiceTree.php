@@ -12,52 +12,32 @@
 	#
 
 	require_once 'XML/TreeNS.php';
+	require_once 'XML/NiceTree/NiceNode.php';
 
 	class XML_NiceTree extends Xml_TreeNS {
 
+		var $base;
+
 		function XML_NiceTree($xml, $encoding = null){
 
+			$this->node_class = 'XML_NiceTree_NiceNode';
+
 			$this->getTreeFromString($xml, $encoding);
-			$this->children = array($this->root);
+
+			$this->base = new XML_NiceTree_NiceNode('FAKE');
+			$this->base->children = array($this->root);
+		}
+
+		function findMulti($list){
+			return $this->base->findMulti($list);
 		}
 
 		function findSingle($list){
-
-			$nodes = $this->findMulti($list);
-			return $nodes[0];
-		}
-
-
-		function findMulti($list){
-
-			$parts = explode('/', $list);
-
-			$parent = $this;
-
-			foreach ($parts as $part){
-
-				$hits = array();
-
-				foreach ($parent->children as $child){
-
-					if ($child->name == $part){
-
-						$hits[] = $child;
-					}
-				}
-
-				if (!count($hits)) return array();
-				$parent = $hits[0];
-			}
-
-			return $hits;
+			return $this->base->findSingle($list);
 		}
 
 		function findSingleAttribute($list, $attribute){
-
-			$node = $this->findSingle($list);
-
-			return $node ? $node->attributes[$attribute] : null;
+			return $this->base->findSingleAttribute($list, $attribute);
 		}
 	}
 

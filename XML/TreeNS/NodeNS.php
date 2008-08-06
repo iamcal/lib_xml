@@ -21,6 +21,7 @@
 		var $children;
 		var $content;
 		var $name;
+		var $is_a_node = 1;
 
 		function XML_TreeNS_NodeNS($name, $content = '', $attributes = array()){
 			$this->attributes = $attributes;
@@ -32,14 +33,15 @@
 		function &addChild($child, $content = '', $attributes = array()){
 			$index = sizeof($this->children);
 			if (is_object($child)){
-				if (strtolower(get_class($child)) == 'xml_treens_nodens'){
+				if ($child->is_a_node){
 					$this->children[$index] = $child;
 				}
-				if (strtolower(get_class($child)) == 'xml_treens' && isset($child->root)){
+				if ($child->is_a_tree && isset($child->root)){
 					$this->children[$index] = $child->root->get_element();
 				}
 			}else{
-				$this->children[$index] = new XML_TreeNS_NodeNS($child, $content, $attributes);
+				$my_class = get_class($this);
+				$this->children[$index] = new $my_class($child, $content, $attributes);
 			}
 			return $this->children[$index];
 		}
@@ -48,7 +50,7 @@
 			$clone=new XML_TreeNS_NodeNS($this->name,$this->content,$this->attributes);
 			$max_child=count($this->children);
 			for($i=0;$i<$max_child;$i++) {
-				$clone->children[]=$this->children[$i]->clone();
+				$clone->children[] = $this->children[$i]->clone();
 			}
 			return($clone);
 		}
@@ -56,14 +58,15 @@
 		function &insertChild($path,$pos,&$child, $content = '', $attributes = array()){
 			array_splice($this->children,$pos,0,'dummy');
 			if (is_object($child)){
-				if (strtolower(get_class($child)) == 'xml_treens_nodens'){
+				if ($child->is_a_node){
 					$this->children[$pos]=&$child;
 				}
-				if (strtolower(get_class($child)) == 'xml_treens' && isset($child->root)){
+				if ($child->is_a_tree && isset($child->root)){
 					$this->children[$pos]=$child->root->get_element();
 				}
 			}else{
-				$this->children[$pos]=new XML_TreeNS_NodeNS($child, $content, $attributes);
+				$my_class = get_class($this);
+				$this->children[$pos] = new $my_class($child, $content, $attributes);
 			}
 			return($this);
 		}
